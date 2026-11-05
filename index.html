@@ -1,0 +1,207 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Girish Kumar Data Engineering</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: dark-first engineering notebook. Hero, then a project explorer (tabs) showing architecture flow, what I did, and a technique sketch. */
+:root{
+  --bg:#0f1417; --panel:#161d22; --panel2:#1b242a; --fg:#e8eef0; --muted:#8fa1a8; --line:#2a363d;
+  --accent:#ff7a45; --accent2:#5ec8e5; --ok:#6fd39a;
+  --display:'Bricolage Grotesque',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f5f3ef; --panel:#ffffff; --panel2:#ece9e3; --fg:#161b1e; --muted:#5b6a70; --line:#d9d4ca;
+  --accent:#c2410c; --accent2:#0e6f8c; --ok:#1d7a4a; color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f5f3ef; --panel:#ffffff; --panel2:#ece9e3; --fg:#161b1e; --muted:#5b6a70; --line:#d9d4ca;
+  --accent:#c2410c; --accent2:#0e6f8c; --ok:#1d7a4a; color-scheme:light}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1100px;margin:0 auto}
+a{color:var(--accent2)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.mono{font-family:var(--mono)}
+top-bar,.bar{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;padding-block:18px;font:13px var(--mono);color:var(--muted);border-bottom:1px solid var(--line)}
+.bar b{color:var(--fg);font-weight:500}
+.bar .dot{color:var(--ok)}
+header{padding-block:56px 40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;align-items:end}
+@media (max-width:820px){header{grid-template-columns:1fr}}
+h1{font:800 clamp(2.6rem,7.5vw,5rem)/.98 var(--display);letter-spacing:-.03em;margin:0 0 18px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{color:var(--muted);font-size:1.1rem;max-width:56ch;margin:0}
+.lede b{color:var(--fg);font-weight:500}
+.stack-box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 18px;font:13px/1.9 var(--mono);min-width:0}
+.stack-box .k{color:var(--muted)}
+.stack-box .v{color:var(--fg)}
+.stack-box .c{color:var(--ok)}
+h2{font:600 clamp(1.5rem,3.5vw,2rem)/1.2 var(--display);letter-spacing:-.01em;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 24px;max-width:62ch}
+section{padding-block:48px;border-top:1px solid var(--line)}
+/* explorer */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{font:500 13px var(--mono);padding:9px 14px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:4px;cursor:pointer}
+.tab:hover{color:var(--fg);border-color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#14100d}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:clamp(16px,3vw,28px)}
+.pane h3{font:700 1.5rem/1.2 var(--display);margin:0 0 4px}
+.tagline{font:13px var(--mono);color:var(--accent2);margin-bottom:14px}
+.pane>p{margin:0 0 22px;max-width:70ch;color:var(--muted)}
+.flow{display:flex;flex-wrap:wrap;gap:10px 0;align-items:stretch;margin:0 0 26px;padding:0;list-style:none}
+.node{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px 14px;min-width:0;flex:0 1 auto}
+.node small{display:block;font:11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.node strong{font:600 .98rem var(--body)}
+.arrow{display:flex;align-items:center;padding:0 8px;color:var(--accent);font:500 16px var(--mono)}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+h4{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.did{margin:0;padding-left:1.1em}
+.did li{margin-bottom:9px}
+.did li::marker{color:var(--accent)}
+pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:14px 16px;overflow-x:auto;font:12.5px/1.65 var(--mono);color:var(--fg);tab-size:2}
+.cm{color:var(--muted)}
+.kw{color:var(--accent)}
+.st{color:var(--ok)}
+.note{font:11.5px var(--mono);color:var(--muted);margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:20px 0 0;padding:0}
+.chips li{font:12px var(--mono);padding:3px 9px;border:1px solid var(--line);border-radius:3px;color:var(--fg)}
+/* capability grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.cap{border-top:2px solid var(--accent);padding-top:12px;min-width:0}
+.cap h3{font:600 1.05rem var(--display);margin:0 0 6px}
+.cap p{margin:0;color:var(--muted);font-size:.93rem}
+/* BI */
+.bi{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.bi article{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:20px;min-width:0}
+.bi h3{font:600 1.1rem var(--display);margin:0 0 6px}
+.bi p{margin:0 0 10px;color:var(--muted);font-size:.93rem}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 16px;max-width:520px;margin-bottom:10px}
+.row code{font:500 15px var(--mono);overflow-wrap:anywhere}
+.row span{font:12px var(--mono);color:var(--muted)}
+.row button{font:12px var(--mono);padding:6px 12px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;border-radius:3px}
+.row button:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--line);padding-block:26px;font:12px var(--mono);color:var(--muted)}
+</style>
+
+<div class="wrap">
+<div class="bar"><b>girish.kumar / data-engineering</b><span><span class="dot">●</span> HCLTech · Hyderabad · since Jul 2025</span></div>
+
+<header>
+  <div>
+    <h1>Pipelines that load, <em>reconcile</em> and keep running.</h1>
+    <p class="lede">Data engineer with 1.5 years at HCLTech. I work on <b>Databricks, PySpark and Delta Lake</b> pipelines for retail and for Carrier, validate every load against its source, and add <b>RAG</b> workflows on top of the data.</p>
+  </div>
+  <div class="stack-box" aria-label="Core stack">
+    <div><span class="k">compute   </span><span class="v">PySpark · Databricks</span></div>
+    <div><span class="k">storage   </span><span class="v">ADLS Gen2 · Delta Lake</span></div>
+    <div><span class="k">ingest    </span><span class="v">Kafka · Azure Data Factory</span></div>
+    <div><span class="k">model     </span><span class="v">Star schema · SCD 1/2</span></div>
+    <div><span class="k">serve     </span><span class="v">Power BI · DAX</span></div>
+    <div><span class="k">genai     </span><span class="v">OpenAI · LangChain · FAISS</span></div>
+    <div><span class="k">lang      </span><span class="c">Python · SQL</span></div>
+  </div>
+</header>
+
+<section id="projects">
+  <h2>Pipeline projects</h2>
+  <p class="sub">Pick a project to see how the data moves, what I owned, and a sketch of the core technique.</p>
+  <div class="tabs" role="tablist" aria-label="Projects">
+    <button class="tab" role="tab" id="t0" aria-selected="true" aria-controls="pane" data-i="0">Azure ETL (Carrier)</button>
+    <button class="tab" role="tab" id="t1" aria-selected="false" aria-controls="pane" data-i="1">GAP retail workflows</button>
+    <button class="tab" role="tab" id="t2" aria-selected="false" aria-controls="pane" data-i="2">Offline RAG assistant</button>
+    <button class="tab" role="tab" id="t3" aria-selected="false" aria-controls="pane" data-i="3">Churn analytics</button>
+  </div>
+  <div class="pane" id="pane" role="tabpanel" aria-live="polite"></div>
+</section>
+
+<section id="capabilities">
+  <h2>What I do day to day</h2>
+  <p class="sub">The recurring work behind those projects.</p>
+  <div class="grid">
+    <div class="cap"><h3>Build transformations</h3><p>Databricks notebooks with PySpark DataFrames and RDDs for filtering, joins and aggregations.</p></div>
+    <div class="cap"><h3>Validate and reconcile</h3><p>SQL-based checks and source-to-target reconciliation on Delta tables.</p></div>
+    <div class="cap"><h3>Keep jobs healthy</h3><p>Monitor Databricks Jobs and Workflows, trace failures and support fixes.</p></div>
+    <div class="cap"><h3>Load incrementally</h3><p>Watermark-based loads, MERGE upserts and SCD Type 1 and 2 targets.</p></div>
+    <div class="cap"><h3>Document it</h3><p>Data flows, dependencies, transformation rules and validation procedures written down.</p></div>
+    <div class="cap"><h3>Ship with Git</h3><p>GitHub for version control, collaboration and code deployment.</p></div>
+  </div>
+</section>
+
+<section id="bi">
+  <h2>Reporting and BI</h2>
+  <p class="sub">The serving layer: Power BI models and dashboards.</p>
+  <div class="bi">
+    <article><h3>Zomato restaurant analytics</h3><p>Restaurant counts, cuisines, countries, cities and ratings with year-wise and country-wise filters. Top 5 cities per country.</p><ul class="chips"><li>Power BI</li><li>Tableau</li><li>SQL</li></ul></article>
+    <article><h3>IPL player performance</h3><p>Season KPIs for runs, sixes, fours, Orange Cap and Purple Cap, with season, batsman and bowler slicers.</p><ul class="chips"><li>Power BI</li><li>DAX</li></ul></article>
+    <article><h3>Modelling practice</h3><p>Fact and dimension tables, star schema, Power Query cleaning, DAX measures, filter context, drill-through.</p><ul class="chips"><li>Star schema</li><li>Power Query</li><li>DAX</li></ul></article>
+  </div>
+</section>
+
+<section id="contact">
+  <h2>Contact</h2>
+  <p class="sub">B.Tech, Vel Tech University, Chennai (2022).</p>
+  <div class="row"><div><span>Email</span><br><code id="email">girish983kumar@gmail.com</code></div><button type="button" data-copy="email">Copy</button></div>
+  <div class="row"><div><span>Mobile</span><br><code id="phone">+91-9353761352</code></div><button type="button" data-copy="phone">Copy</button></div>
+</section>
+<footer>Girish Kumar · Data Engineer · Hyderabad, India</footer>
+</div>
+
+<script>
+var P=[
+{name:"Azure ETL Pipeline",tag:"HCLTech · Client: Carrier · Data Engineer",
+ desc:"A cloud ETL pipeline that ingests data incrementally, transforms it, and keeps analytical tables reliable on Azure data services.",
+ flow:[["Orchestrate","Azure Data Factory"],["Land","ADLS Gen2 raw"],["Transform","Azure Databricks · PySpark"],["Serve","Delta Lake tables"]],
+ did:["Built ingestion and orchestration in Azure Data Factory; stored raw and processed data in ADLS Gen2.","Implemented watermark-based incremental loading.","Cleansed, standardized and validated source data in PySpark.","Implemented SCD Type 1 and Type 2 with SQL and Delta Lake MERGE.","Added logging, exception handling and pipeline monitoring.","Documented data flows, dependencies, transformation rules and validation procedures."],
+ code:'<span class="cm"># Technique sketch: SCD Type 2 upsert with Delta MERGE</span>\n<span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable\n\ntarget = DeltaTable.forName(spark, <span class="st">"silver.customer"</span>)\n(target.alias(<span class="st">"t"</span>)\n  .merge(updates.alias(<span class="st">"s"</span>),\n         <span class="st">"t.id = s.id AND t.is_current"</span>)\n  .whenMatchedUpdate(\n     condition=<span class="st">"t.row_hash <> s.row_hash"</span>,\n     set={<span class="st">"is_current"</span>: <span class="st">"false"</span>,\n          <span class="st">"end_date"</span>: <span class="st">"s.load_date"</span>})\n  .whenNotMatchedInsertAll()\n  .execute())',
+ stack:["Azure Data Factory","ADLS Gen2","Azure Databricks","PySpark","SQL","Delta Lake"]},
+{name:"GAP Retail Data Workflows",tag:"HCLTech · Retail / E-commerce · Data Engineer · Jul 2025 to present",
+ desc:"Retail data processing and business reporting on Databricks, with Kafka for integration and a GenAI workflow built on RAG.",
+ flow:[["Integrate","Apache Kafka"],["Transform","Databricks · PySpark · SQL"],["Validate","Source-to-target checks"],["Report","Power BI"],["Augment","OpenAI · LangChain RAG"]],
+ did:["Maintain retail data workflows in Python, SQL, PySpark and Databricks.","Develop and maintain Databricks notebooks for transformation logic and ETL/ELT.","Use DataFrames and RDDs for filtering, joins, aggregations and distributed processing.","Run SQL validation and source-to-target reconciliation.","Monitor Databricks Jobs and Workflows and support troubleshooting.","Support Kafka integration and Power BI reports (KPI visuals, slicers, DAX, data modelling).","Work with OpenAI and LangChain in the RAG workflow, using embeddings to retrieve context."],
+ code:'<span class="cm">-- Technique sketch: source-to-target reconciliation</span>\n<span class="kw">SELECT</span> <span class="st">\'row_count\'</span> <span class="kw">AS</span> check_name,\n       s.n <span class="kw">AS</span> source_value, t.n <span class="kw">AS</span> target_value,\n       s.n - t.n <span class="kw">AS</span> diff\n<span class="kw">FROM</span> (<span class="kw">SELECT</span> COUNT(*) n <span class="kw">FROM</span> source_orders) s\n<span class="kw">CROSS JOIN</span> (<span class="kw">SELECT</span> COUNT(*) n <span class="kw">FROM</span> delta_orders) t;',
+ stack:["PySpark","Databricks","Python","SQL","Kafka","OpenAI","LangChain","RAG","Embeddings","Power BI","GitHub"]},
+{name:"Offline RAG Assistant",tag:"Personal project · GenAI",
+ desc:"A document Q&A assistant that creates embeddings, retrieves relevant context with FAISS and answers from that context.",
+ flow:[["Ingest","Documents"],["Embed","Embeddings"],["Index","FAISS"],["Retrieve","Top-k context"],["Answer","LLM via Streamlit"]],
+ did:["Implemented document ingestion and embedding generation.","Built FAISS retrieval of relevant document context.","Wired LLM question answering into a Streamlit interface."],
+ code:'<span class="cm"># Technique sketch: retrieve, then answer from context</span>\ndocs = retriever.get_relevant_documents(question)\ncontext = <span class="st">"\\n\\n"</span>.join(d.page_content <span class="kw">for</span> d <span class="kw">in</span> docs)\nanswer = llm.invoke(\n  <span class="st">f"Answer using only this context:\\n{context}\\n\\nQ: {question}"</span>)',
+ stack:["Python","OpenAI","LangChain","RAG","Embeddings","FAISS","Streamlit"]},
+{name:"Customer Analytics & Churn",tag:"Personal project · Analytics and ML",
+ desc:"Customer retention, churn patterns, revenue trends and business performance, from raw data to dashboards.",
+ flow:[["Extract","SQL"],["Clean","Python · Pandas"],["Model","Logistic Regression · Random Forest"],["Report","Power BI"]],
+ did:["Extracted, cleaned and transformed customer data with Python, Pandas and SQL.","Ran EDA and feature engineering to find churn indicators.","Built and evaluated Logistic Regression and Random Forest models on classification metrics.","Built Power BI dashboards for churn rate, segments, retention trends and business indicators; used SQL joins, aggregations and window functions."],
+ code:'<span class="cm">-- Technique sketch: months since a customer\'s first order</span>\n<span class="kw">SELECT</span> customer_id, order_month,\n  <span class="kw">ROW_NUMBER</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> customer_id\n                     <span class="kw">ORDER BY</span> order_month) - 1 <span class="kw">AS</span> month_index\n<span class="kw">FROM</span> monthly_orders;',
+ stack:["SQL","Python","Pandas","PySpark","Scikit-learn","Power BI"]}
+];
+var pane=document.getElementById('pane');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function show(i){
+  var p=P[i],f='';
+  p.flow.forEach(function(n,k){
+    if(k)f+='<li class="arrow" aria-hidden="true">→</li>';
+    f+='<li class="node"><small>'+esc(n[0])+'</small><strong>'+esc(n[1])+'</strong></li>';
+  });
+  pane.innerHTML='<h3>'+esc(p.name)+'</h3><div class="tagline">'+esc(p.tag)+'</div><p>'+esc(p.desc)+'</p>'+
+   '<ol class="flow" aria-label="Data flow">'+f+'</ol>'+
+   '<div class="cols"><div><h4>What I did</h4><ul class="did">'+p.did.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'+
+   '<div><h4>Core technique</h4><pre><code>'+p.code+'</code></pre><div class="note">Illustrative sketch of the technique, not code from the project.</div></div></div>'+
+   '<ul class="chips">'+p.stack.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>';
+  document.querySelectorAll('.tab').forEach(function(t){t.setAttribute('aria-selected',String(+t.dataset.i===i))});
+  pane.setAttribute('aria-labelledby','t'+i);
+}
+document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){show(+t.dataset.i)})});
+show(0);
+document.querySelectorAll('[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy);
+    var done=function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1500)};
+    var fb=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected'};
+    try{navigator.clipboard.writeText(el.textContent).then(done,fb)}catch(e){fb()}
+  });
+});
+</script>
+
+</body></html>
